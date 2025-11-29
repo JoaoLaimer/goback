@@ -7,16 +7,18 @@ import (
 	"strings"
 )
 
-func DetectKeyboardDevice() (string, error) {
+func DetectKeyboardDevice() ([]string, error) {
 
 	data, err := os.ReadFile("/proc/bus/input/devices")
 	if err != nil {
-		return "", fmt.Errorf("Failure reading devices: %v", err)
+		return nil, fmt.Errorf("failure reading devices: %v", err)
 	}
 
 	content := string(data)
 
 	blocks := strings.Split(content, "\n\n")
+
+	var paths []string
 
 	for _, block := range blocks {
 
@@ -29,10 +31,15 @@ func DetectKeyboardDevice() (string, error) {
 			match := re.FindString(block)
 
 			if match != "" {
-				fullPath := fmt.Sprintf("/dev/input/%s", match)
-				return fullPath, nil
+				paths = append(paths, fmt.Sprintf("/dev/input/%s", match))
 			}
 		}
 	}
-	return "", fmt.Errorf("No keyboard found")
+
+	fmt.Println(paths)
+	if len(paths) > 0 {
+		return paths, nil
+	} else {
+		return nil, fmt.Errorf("no keyboard found")
+	}
 }

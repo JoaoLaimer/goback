@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 type InputEvent struct {
@@ -23,7 +24,23 @@ func Setup(keyChan chan<- string) {
 		log.Fatalf("Error Detecting device: %v", err)
 	}
 
-	f, err := os.Open(devicePath)
+	var wg sync.WaitGroup
+
+	for _, path := range devicePath {
+		wg.Add(1)
+		go func(p string) {
+			defer wg.Done()
+			readKeys(path, keyChan)
+		}(path)
+	}
+
+	wg.Wait()
+
+}
+
+func readKeys(path string, keyChan chan<- string) {
+
+	f, err := os.Open(path)
 	if err != nil {
 		log.Fatalf("Error tracking device (are you root?): %v", err)
 	}
