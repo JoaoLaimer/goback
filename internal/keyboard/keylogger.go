@@ -18,7 +18,10 @@ type InputEvent struct {
 }
 
 func Setup(keyChan chan<- string) {
-	devicePath := "/dev/input/event5"
+	devicePath, err := DetectKeyboardDevice()
+	if err != nil {
+		log.Fatalf("Error Detecting device: %v", err)
+	}
 
 	f, err := os.Open(devicePath)
 	if err != nil {
@@ -63,7 +66,7 @@ func mapKeycode(code uint16, caps bool) string {
 		16: "Q", 17: "W", 18: "E", 19: "R", 20: "T", 21: "Y", 22: "U", 23: "I", 24: "O", 25: "P",
 		30: "A", 31: "S", 32: "D", 33: "F", 34: "G", 35: "H", 36: "J", 37: "K", 38: "L",
 		44: "Z", 45: "X", 46: "C", 47: "V", 48: "B", 49: "N", 50: "M",
-		42: "SHIFT", 58: "CAPSLOCK",
+		42: "SHIFT",
 	}
 	if name, ok := keyMap[code]; ok {
 
@@ -73,5 +76,5 @@ func mapKeycode(code uint16, caps bool) string {
 			return strings.ToLower(name)
 		}
 	}
-	return "UNKNOWN"
+	return "."
 }
