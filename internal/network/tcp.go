@@ -1,7 +1,6 @@
 package network
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"log"
@@ -27,7 +26,8 @@ func StartServer(port string) {
 			continue
 		}
 
-		go handleConnection(conn)
+		go listenToClient(conn)
+		go sendToClient(conn)
 	}
 }
 
@@ -42,22 +42,10 @@ func StartClient(address string, port string, keyChan <-chan string) {
 
 	log.Println("Connection Succeded")
 
-	go func() {
-		for key := range keyChan {
-			fmt.Fprintf(conn, "%s", key)
-		}
-	}()
-	io.Copy(os.Stdout, conn)
-}
+	go listenToServer(conn)
 
-func handleConnection(conn net.Conn) {
-	defer conn.Close()
-
-	scanner := bufio.NewScanner(conn)
-	for scanner.Scan() {
-		text := scanner.Text()
-		log.Printf("%s", text)
-
+	for key := range keyChan {
+		fmt.Fprintf(conn, "%s", key)
 	}
-
+	io.Copy(os.Stdout, conn)
 }
