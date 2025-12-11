@@ -51,12 +51,15 @@ Once running, the client will auto-detect keyboards and stream keys to the serve
 ## Project Structure
 ```
 .
-├── bin/             # Compiled binaries
+├── bin/                # Compiled binaries
 ├── cmd/
-│   └── goback/      # Main entry point and CLI parsing
+│   └── goback/         # Main entry point and CLI parsing
 ├── internal/
-│   ├── keyboard/    # Low-level capture logic (IOCTL, Discovery, Parsing)
-│   └── network/     # TCP Client/Server logic
-└── go.mod           # Go module definition
+│   ├── keyboard/       # Low-level capture logic (IOCTL, Discovery, Parsing)
+│   ├── network/        # TCP Client/Server logic
+│   │   ├── client/     # Client-side code
+│   │   └── server/     # Server-side code
+│   └── terminal/
+└── README.md
 ```
 Developed by Joao Laimer.
