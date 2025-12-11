@@ -1,4 +1,4 @@
-package network
+package server
 
 import (
 	"bufio"
@@ -8,23 +8,29 @@ import (
 	"os"
 )
 
-func sendToClient(conn net.Conn) {
+var connection net.Conn
+
+func SendToClient() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 
 		text := scanner.Text()
-		fmt.Fprintf(conn, text+"\n")
+		fmt.Fprintf(connection, text+"\n")
 		fmt.Print("\r>> ")
 
 	}
 }
-func listenToClient(conn net.Conn) {
-	defer conn.Close()
-	scanner := bufio.NewScanner(conn)
+func ListenToClient() {
+	defer connection.Close()
+	scanner := bufio.NewScanner(connection)
 	fmt.Print("\r>> ")
 	for scanner.Scan() {
 		text := scanner.Text()
 		log.Printf(": %s", text)
 	}
 
+}
+
+func SetConnection(conn net.Conn) {
+	connection = conn
 }

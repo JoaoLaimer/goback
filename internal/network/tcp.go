@@ -2,6 +2,8 @@ package network
 
 import (
 	"fmt"
+	"goback/internal/network/client"
+	"goback/internal/network/server"
 	"io"
 	"log"
 	"net"
@@ -25,9 +27,9 @@ func StartServer(port string) {
 			log.Println("Error accepting conn:", err)
 			continue
 		}
-
-		go listenToClient(conn)
-		go sendToClient(conn)
+		server.SetConnection(conn)
+		go server.ListenToClient()
+		go server.SendToClient()
 	}
 }
 
@@ -42,7 +44,8 @@ func StartClient(address string, port string, keyChan <-chan string) {
 
 	log.Println("Connection Succeded")
 
-	go listenToServer(conn)
+	client.SetConnection(conn)
+	go client.ListenToServer()
 
 	for key := range keyChan {
 		fmt.Fprintf(conn, "%s", key)
